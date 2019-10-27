@@ -21,6 +21,15 @@ lazy val protobufs = (project in file("./protobufs"))
     )
   )
 
+lazy val modelServer = (project in file("./modelServer"))
+  .settings(dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-core" % "2.9.1",
+    dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.1"
+  )
+  .settings(libraryDependencies ++= Seq(Dependencies.kafkaStreams, Dependencies.kafkaStreamsScala)
+                                ++ Dependencies.webDependencies ++ Dependencies.akkHTTPPSupport)
+  .dependsOn(model, configuration)
+
+
 lazy val model = (project in file("./model"))
   .settings(libraryDependencies ++= Dependencies.modelsDependencies)
   .dependsOn(protobufs)
