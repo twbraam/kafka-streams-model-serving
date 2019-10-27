@@ -8,3 +8,4 @@ metals.lock.db
 .DS_Store
 *.class
 *.log
+tmp
