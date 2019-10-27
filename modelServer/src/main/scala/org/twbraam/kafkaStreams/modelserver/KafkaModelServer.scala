@@ -1,13 +1,13 @@
-package main.scala.org.twbraam.kafkaStreams.modelserver
+package org.twbraam.kafkaStreams.modelserver
 
 import java.util.Properties
 
-import com.lightbend.java.configuration.kafka.ApplicationKafkaParameters._
-import com.lightbend.scala.kafkastreams.queriablestate.withstore.RestServiceStore
-import com.lightbend.scala.kafkastreams.modelserver.customstore.CustomStoreStreamBuilder
-import com.lightbend.scala.kafkastreams.modelserver.memorystore.MemoryStoreStreamBuilder
-import com.lightbend.scala.kafkastreams.modelserver.standardstore.StandardStoreStreamBuilder
-import com.lightbend.scala.kafkastreams.queriablestate.inmemory.RestServiceInMemory
+import org.twbraam.configuration.KafkaParameters._
+import org.twbraam.kafkaStreams.queriablestate.withstore.RestServiceStore
+import org.twbraam.kafkaStreams.modelserver.customstore.CustomStoreStreamBuilder
+import org.twbraam.kafkaStreams.modelserver.memorystore.MemoryStoreStreamBuilder
+import org.twbraam.kafkaStreams.modelserver.standardstore.StandardStoreStreamBuilder
+import org.twbraam.kafkaStreams.queriablestate.inmemory.RestServiceInMemory
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.{KafkaStreams, StreamsConfig}
 
@@ -75,10 +75,8 @@ object KafkaModelServer {
       case _ => help(s"Unexpected arguments: ${args.mkString(" ")}", 1)
     }
 
-    streams.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-      override def uncaughtException(t: Thread, e: Throwable): Unit = {
-        System.out.println("Uncaught exception on thread " + t + " " + e.toString)
-      }
+    streams.setUncaughtExceptionHandler((t: Thread, e: Throwable) => {
+      System.out.println("Uncaught exception on thread " + t + " " + e.toString)
     })
     // Start streams
     streams.start()

@@ -1,4 +1,4 @@
-package main.scala.org.twbraam.kafkaStreams.queriablestate.inmemory
+package org.twbraam.kafkaStreams.queriablestate.inmemory
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
@@ -6,11 +6,12 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
-import com.lightbend.scala.kafkastreams.store.StoreState
+import org.twbraam.kafkaStreams.store.StoreState
 import de.heikoseeberger.akkahttpjackson.JacksonSupport
 import org.apache.kafka.streams.KafkaStreams
-import com.lightbend.scala.modelServer.model.ModelToServeStats
+import org.twbraam.modelServer.model.ModelToServeStats
 
+import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.concurrent.duration._
 
 /**
@@ -21,17 +22,17 @@ import scala.concurrent.duration._
  */
 object RestServiceInMemory{
 
-  implicit val system = ActorSystem("ModelServing")
-  implicit val materializer = ActorMaterializer()
-  implicit val executionContext = system.dispatcher
-  implicit val timeout = Timeout(10.seconds)
+  implicit val system: ActorSystem = ActorSystem("ModelServing")
+  implicit val materializer: ActorMaterializer = ActorMaterializer()
+  implicit val executionContext: ExecutionContextExecutor = system.dispatcher
+  implicit val timeout: Timeout = Timeout(10.seconds)
   val host = "127.0.0.1"
   val port = 8888
   val routes: Route = QueriesResource.storeRoutes()
 
   // Surf to http://localhost:8888/state/instances for the list of currently deployed instances.
   // Then surf to http://localhost:8888/state/value for the current state of execution for a given model.
-  def startRestProxy(streams: KafkaStreams, port: Int) = {
+  def startRestProxy(streams: KafkaStreams, port: Int): Future[Unit] = {
 
     Http().bindAndHandle(routes, host, port) map
       { binding => println(s"Starting models observer on port ${binding.localAddress}") } recover {

@@ -1,6 +1,6 @@
-package main.scala.org.twbraam.kafkaStreams.modelserver.memorystore
+package org.twbraam.kafkaStreams.modelserver.memorystore
 
-import com.lightbend.scala.modelServer.model.ServingResult
+import org.twbraam.modelServer.model.ServingResult
 import org.apache.kafka.streams.processor.AbstractProcessor
 
 /**

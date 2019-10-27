@@ -1,11 +1,11 @@
-package main.scala.org.twbraam.kafkaStreams.modelserver.standardstore
+package org.twbraam.kafkaStreams.modelserver.standardstore
 
 import java.util.Objects
 
-import com.lightbend.java.configuration.kafka.ApplicationKafkaParameters
-import com.lightbend.model.winerecord.WineRecord
-import com.lightbend.scala.modelServer.model.ServingResult
-import com.lightbend.scala.kafkastreams.store.StoreState
+import org.twbraam.configuration.KafkaParameters
+import org.twbraam.model.winerecord.WineRecord
+import org.twbraam.modelServer.model.ServingResult
+import org.twbraam.kafkaStreams.store.StoreState
 import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.kstream.Transformer
 import org.apache.kafka.streams.processor.ProcessorContext
@@ -22,7 +22,7 @@ class DataProcessor extends Transformer[Array[Byte], Try[WineRecord], (Array[Byt
 
   private var modelStore: KeyValueStore[Integer, StoreState] = null
 
-  import ApplicationKafkaParameters._
+  import KafkaParameters._
 
   // Exercise:
   // See the exercises described in com.lightbend.scala.kafkastreams.modelserver.customstore.DataProcessor.
@@ -77,7 +77,7 @@ class DataProcessorKV extends Transformer[Array[Byte], Try[WineRecord], KeyValue
 
   private var modelStore: KeyValueStore[Integer, StoreState] = null
 
-  import ApplicationKafkaParameters._
+  import KafkaParameters._
 
   override def transform(key: Array[Byte], dataRecord: Try[WineRecord]) : KeyValue[Array[Byte], ServingResult] = {
 

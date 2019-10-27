@@ -1,11 +1,11 @@
-package main.scala.org.twbraam.kafkaStreams.modelserver.customstore
+package org.twbraam.kafkaStreams.modelserver.customstore
 
 import java.util.Objects
 
 import org.apache.kafka.streams.processor.{AbstractProcessor, ProcessorContext}
-import com.lightbend.java.configuration.kafka.ApplicationKafkaParameters
-import com.lightbend.scala.modelServer.model.{ModelToServeStats, ModelWithDescriptor}
-import com.lightbend.scala.kafkastreams.store.store.custom.ModelStateStore
+import org.twbraam.configuration.KafkaParameters
+import org.twbraam.modelServer.model.{ModelToServeStats, ModelWithDescriptor}
+import org.twbraam.kafkaStreams.store.store.custom.ModelStateStore
 
 import scala.util.Try
 
@@ -16,7 +16,7 @@ class ModelProcessor extends AbstractProcessor[Array[Byte], Try[ModelWithDescrip
 
   private var modelStore: ModelStateStore = null
 
-  import ApplicationKafkaParameters._
+  import KafkaParameters._
   override def process (key: Array[Byte], modelWithDescriptor: Try[ModelWithDescriptor]): Unit = {
 
     modelStore.state.newModel = Some(modelWithDescriptor.get.model)

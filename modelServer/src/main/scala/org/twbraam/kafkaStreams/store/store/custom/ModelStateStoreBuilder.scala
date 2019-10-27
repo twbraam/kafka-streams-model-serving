@@ -1,7 +1,7 @@
-package main.scala.org.twbraam.kafkaStreams.store.store.custom
+package org.twbraam.kafkaStreams.store.store.custom
 
 import java.util
-import java.util.{Objects}
+import java.util.Objects
 
 import org.apache.kafka.streams.state.StoreBuilder
 
@@ -19,6 +19,11 @@ class ModelStateStoreBuilder(nm: String) extends StoreBuilder [ModelStateStore]{
 
   override def withCachingEnabled: ModelStateStoreBuilder = {
     enableCaching = true
+    this
+  }
+
+  override def withCachingDisabled: ModelStateStoreBuilder = {
+    enableCaching = false
     this
   }
 

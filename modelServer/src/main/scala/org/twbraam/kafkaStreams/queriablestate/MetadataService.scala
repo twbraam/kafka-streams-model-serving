@@ -1,13 +1,13 @@
-package main.scala.org.twbraam.kafkaStreams.queriablestate
+package org.twbraam.kafkaStreams.queriablestate
 
 import java.net.InetAddress
 import java.util
 
-import com.lightbend.java.configuration.kafka.ApplicationKafkaParameters
-import com.lightbend.scala.kafkastreams.store.HostStoreInfo
+import org.twbraam.kafkaStreams.store.HostStoreInfo
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.state.{HostInfo, StreamsMetadata}
+import org.twbraam.configuration.KafkaParameters
 
 import scala.collection.JavaConverters._
 
@@ -27,24 +27,24 @@ class MetadataService(streams: KafkaStreams) {
     */
   def streamsMetadataForStore(store: String, port: Int): util.List[HostStoreInfo] = { // Get metadata for all of the instances of this Kafka Streams application hosting the store
     val metadata = streams.allMetadataForStore(store).asScala.toSeq match{
-      case list if !list.isEmpty => list
+      case list if list.nonEmpty => list
       case _ => Seq(new StreamsMetadata(
         new HostInfo("localhost", port),
-        new util.HashSet[String](util.Arrays.asList(ApplicationKafkaParameters.STORE_NAME)), util.Collections.emptySet[TopicPartition]))
+        new util.HashSet[String](util.Arrays.asList(KafkaParameters.STORE_NAME)), util.Collections.emptySet[TopicPartition]))
     }
     mapInstancesToHostStoreInfo(metadata)
   }
 
 
-  private def mapInstancesToHostStoreInfo(metadatas: Seq[StreamsMetadata]) = metadatas.map(convertMetadata(_)).asJava
+  private def mapInstancesToHostStoreInfo(metadatas: Seq[StreamsMetadata]): util.List[HostStoreInfo] = metadatas.map(convertMetadata).asJava
 
   private def convertMetadata(metadata: StreamsMetadata) : HostStoreInfo = {
     val currentHost = metadata.host match{
-      case host if host equalsIgnoreCase("localhost") =>
+      case host if host equalsIgnoreCase "localhost" =>
         try{InetAddress.getLocalHost.getHostAddress}
         catch {case t: Throwable => ""}
       case host => host
     }
-     new HostStoreInfo(currentHost, metadata.port, metadata.stateStoreNames.asScala.toSeq)
+     HostStoreInfo(currentHost, metadata.port, metadata.stateStoreNames.asScala.toSeq)
   }
 }

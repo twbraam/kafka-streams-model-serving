@@ -1,13 +1,13 @@
-package main.scala.org.twbraam.kafkaStreams.store.store.custom
+package org.twbraam.kafkaStreams.store.store.custom
 
-import com.lightbend.java.configuration.kafka.ApplicationKafkaParameters
-import com.lightbend.scala.modelServer.model._
-import com.lightbend.scala.kafkastreams.store.StoreState
-import com.lightbend.scala.kafkastreams.store.store.ModelStateSerde
+import org.twbraam.modelServer.model._
+import org.twbraam.kafkaStreams.store.StoreState
+import org.twbraam.kafkaStreams.store.store.ModelStateSerde
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.processor.{ProcessorContext, StateRestoreCallback, StateStore}
 import org.apache.kafka.streams.state.internals.StateStoreProvider
 import org.apache.kafka.streams.state.{QueryableStoreType, StateSerdes}
+import org.twbraam.configuration.KafkaParameters
 
 /**
  * Implementation of a custom state store based on
@@ -17,7 +17,7 @@ import org.apache.kafka.streams.state.{QueryableStoreType, StateSerdes}
  */
 class ModelStateStore(name: String, loggingEnabled: Boolean) extends StateStore with ReadableModelStateStore {
 
-  import ApplicationKafkaParameters._
+  import KafkaParameters._
 
   var state = new StoreState
   val changelogKey = STORE_ID
@@ -30,7 +30,7 @@ class ModelStateStore(name: String, loggingEnabled: Boolean) extends StateStore 
     val serdes = new StateSerdes[Integer, StoreState](name, Serdes.Integer, new ModelStateSerde)
     changeLogger = new ModelStateStoreChangeLogger[Integer,StoreState](name, context, serdes)
     if (root != null && loggingEnabled)
-      context.register(root, loggingEnabled, new StateRestoreCallback() {
+      context.register(root, new StateRestoreCallback() {
       override def restore(key: Array[Byte], value: Array[Byte]): Unit = {
         if (value == null) state.zero()
         else state = serdes.valueFrom(value)
@@ -51,13 +51,13 @@ class ModelStateStore(name: String, loggingEnabled: Boolean) extends StateStore 
 
   override def isOpen: Boolean = open
 
-  def getCurrentModel: Model = state.currentModel.getOrElse(null)
+  def getCurrentModel: Model = state.currentModel.orNull
 
   def setCurrentModel(currentModel: Model): Unit = {
     state.currentModel = Some(currentModel)
   }
 
-  def getNewModel: Model = state.newModel.getOrElse(null)
+  def getNewModel: Model = state.newModel.orNull
 
   def setNewModel(newModel: Model): Unit = {
     state.newModel = Some(newModel)

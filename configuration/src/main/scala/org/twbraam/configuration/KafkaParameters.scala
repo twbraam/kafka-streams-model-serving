@@ -1,4 +1,4 @@
-package org.twbraam.kafka.configuration
+package org.twbraam.configuration
 
 object KafkaParameters {
   val KAFKA_BROKER = "localhost:9092"

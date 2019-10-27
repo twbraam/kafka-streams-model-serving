@@ -1,7 +1,7 @@
-package main.scala.org.twbraam.kafkaStreams.modelserver
+package org.twbraam.kafkaStreams.modelserver
 
-import com.lightbend.model.winerecord.WineRecord
-import com.lightbend.scala.modelServer.model.{DataRecord, ModelToServe, ModelWithDescriptor, ServingResult}
+import org.twbraam.model.winerecord.WineRecord
+import org.twbraam.modelServer.model.{DataRecord, ModelToServe, ModelWithDescriptor, ServingResult}
 import org.apache.kafka.streams.kstream.{Predicate, ValueMapper}
 
 import scala.util.Try

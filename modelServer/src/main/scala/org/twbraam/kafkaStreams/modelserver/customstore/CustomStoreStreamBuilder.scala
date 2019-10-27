@@ -1,18 +1,21 @@
-package main.scala.org.twbraam.kafkaStreams.modelserver.customstore
+package org.twbraam.kafkaStreams.modelserver.customstore
 
 import java.util.{HashMap, Properties}
 
-import com.lightbend.scala.kafkastreams.store.store.custom.ModelStateStoreBuilder
-import com.lightbend.java.configuration.kafka.ApplicationKafkaParameters._
-import com.lightbend.kafka.scala.streams.StreamsBuilderS
-import com.lightbend.model.winerecord.WineRecord
-import com.lightbend.scala.kafkastreams.modelserver._
+import org.twbraam.kafkaStreams.store.store.custom.ModelStateStoreBuilder
+import org.twbraam.configuration.KafkaParameters._
+import org.apache.kafka.streams.StreamsBuilder
+import org.twbraam.model.winerecord.WineRecord
+import org.twbraam.kafkaStreams.modelserver._
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.kstream.{KStream, Predicate, ValueMapper}
-import com.lightbend.scala.modelServer.model.{DataRecord, ModelToServe, ModelWithDescriptor, ServingResult}
+import org.twbraam.modelServer.model.{DataRecord, ModelToServe, ModelWithDescriptor, ServingResult}
 import org.apache.kafka.streams.KafkaStreams
-import com.lightbend.kafka.scala.streams.DefaultSerdes._
-import com.lightbend.kafka.scala.streams.ImplicitConversions._
+import org.apache.kafka.common.serialization.Serdes
+import org.apache.kafka.streams.{KafkaStreams, StreamsBuilder}
+import org.apache.kafka.streams.kstream.{KStream, Predicate, ValueMapper}
+import org.apache.kafka.streams.state.Stores
+import org.apache.kafka.streams.scala.ImplicitConversions._
 
 import scala.util.Try
 
@@ -29,7 +32,7 @@ object CustomStoreStreamBuilder {
     val storeBuilder: ModelStateStoreBuilder = new ModelStateStoreBuilder(STORE_NAME).withLoggingEnabled(logConfig)
 
     // Create Stream builder
-    val builder = new StreamsBuilderS
+    val builder = new StreamsBuilder
     // Data input streams
     val data  = builder.stream[Array[Byte], Array[Byte]](DATA_TOPIC)
     val models  = builder.stream[Array[Byte], Array[Byte]](MODELS_TOPIC)

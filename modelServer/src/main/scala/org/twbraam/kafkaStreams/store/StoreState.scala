@@ -1,6 +1,6 @@
-package main.scala.org.twbraam.kafkaStreams.store
+package org.twbraam.kafkaStreams.store
 
-import com.lightbend.scala.modelServer.model._
+import org.twbraam.modelServer.model._
 
 /**
  * Encapsulation of the model state storage information.

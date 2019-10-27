@@ -1,12 +1,12 @@
-package main.scala.org.twbraam.kafkaStreams.modelserver.customstore
+package org.twbraam.kafkaStreams.modelserver.customstore
 
 import java.util.Objects
 
 import org.apache.kafka.streams.processor.ProcessorContext
-import com.lightbend.model.winerecord.WineRecord
-import com.lightbend.java.configuration.kafka.ApplicationKafkaParameters
-import com.lightbend.scala.modelServer.model.ServingResult
-import com.lightbend.scala.kafkastreams.store.store.custom.ModelStateStore
+import org.twbraam.model.winerecord.WineRecord
+import org.twbraam.configuration.KafkaParameters
+import org.twbraam.modelServer.model.ServingResult
+import org.twbraam.kafkaStreams.store.store.custom.ModelStateStore
 import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.kstream.Transformer
 
@@ -21,7 +21,7 @@ class DataProcessor extends Transformer[Array[Byte], Try[WineRecord], (Array[Byt
 
   private var modelStore: ModelStateStore = null
 
-  import ApplicationKafkaParameters._
+  import KafkaParameters._
 
   // Exercise:
   // Currently, one model for each kind of data is returned. For model serving,
@@ -96,7 +96,7 @@ class DataProcessorKV extends Transformer[Array[Byte], Try[WineRecord], KeyValue
 
   private var modelStore: ModelStateStore = null
 
-  import ApplicationKafkaParameters._
+  import KafkaParameters._
 
   override def transform(key: Array[Byte], dataRecord: Try[WineRecord]) : KeyValue[Array[Byte], ServingResult] = {
     modelStore.state.newModel match {

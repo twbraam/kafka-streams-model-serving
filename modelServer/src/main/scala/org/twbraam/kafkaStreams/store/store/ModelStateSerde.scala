@@ -1,13 +1,13 @@
-package main.scala.org.twbraam.kafkaStreams.store.store
+package org.twbraam.kafkaStreams.store.store
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, DataInputStream, DataOutputStream}
 import java.util
 
-import com.lightbend.model.modeldescriptor.ModelDescriptor
-import com.lightbend.scala.modelServer.model.PMML.PMMLModel
-import com.lightbend.scala.modelServer.model.tensorflow.TensorFlowModel
-import com.lightbend.scala.modelServer.model.{ModelToServeStats, ModelWithDescriptor}
-import com.lightbend.scala.kafkastreams.store.StoreState
+import org.twbraam.model.modeldescriptor.ModelDescriptor
+import org.twbraam.modelServer.model.PMML.PMMLModel
+import org.twbraam.modelServer.model.tensorflow.TensorFlowModel
+import org.twbraam.modelServer.model.{ModelFactory, ModelToServeStats, ModelWithDescriptor}
+import org.twbraam.kafkaStreams.store.StoreState
 import org.apache.kafka.common.serialization.{Deserializer, Serde, Serializer}
 
 /**
@@ -19,17 +19,17 @@ class ModelStateSerde extends Serde[StoreState] {
   private val mserializer = new ModelStateSerializer()
   private val mdeserializer = new ModelStateDeserializer()
 
-  override def deserializer() = mdeserializer
+  override def deserializer(): ModelStateDeserializer = mdeserializer
 
-  override def serializer() = mserializer
+  override def serializer(): ModelStateSerializer = mserializer
 
-  override def configure(configs: util.Map[String, _], isKey: Boolean) = {}
+  override def configure(configs: util.Map[String, _], isKey: Boolean): Unit = {}
 
-  override def close() = {}
+  override def close(): Unit = {}
 }
 
 object ModelStateDeserializer {
-  val factories = Map(
+  val factories: Map[Int, ModelFactory] = Map(
     ModelDescriptor.ModelType.PMML.index -> PMMLModel,
     ModelDescriptor.ModelType.TENSORFLOW.index -> TensorFlowModel
   )
@@ -74,5 +74,5 @@ class ModelStateSerializer extends Serializer[StoreState] {
 
   override def close(): Unit = {}
 
-  override def configure(configs: util.Map[String, _], isKey: Boolean) = {}
+  override def configure(configs: util.Map[String, _], isKey: Boolean): Unit = {}
 }

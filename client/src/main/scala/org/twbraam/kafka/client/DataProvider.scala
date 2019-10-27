@@ -4,7 +4,7 @@ import java.io.{ByteArrayOutputStream, File}
 import java.nio.file.{Files, Paths}
 
 import com.google.protobuf.ByteString
-import org.twbraam.kafka.configuration.KafkaParameters._
+import org.twbraam.configuration.KafkaParameters._
 import org.twbraam.kafka.{KafkaLocalServer, KafkaMessageSender}
 import org.twbraam.model.modeldescriptor.ModelDescriptor
 import org.twbraam.model.winerecord.WineRecord

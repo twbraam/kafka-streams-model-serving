@@ -1,4 +1,4 @@
-package main.scala.org.twbraam.kafkaStreams.queriablestate.withstore
+package org.twbraam.kafkaStreams.queriablestate.withstore
 
 import javax.ws.rs.NotFoundException
 import akka.actor.ActorSystem
@@ -7,14 +7,15 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
-import com.lightbend.scala.kafkastreams.queriablestate.MetadataService
-import com.lightbend.java.configuration.kafka.ApplicationKafkaParameters._
-import com.lightbend.scala.kafkastreams.store.StoreState
-import com.lightbend.scala.kafkastreams.store.store.custom.ModelStateStoreType
+import org.twbraam.kafkaStreams.queriablestate.MetadataService
+import org.twbraam.configuration.KafkaParameters._
+import org.twbraam.kafkaStreams.store.StoreState
+import org.twbraam.kafkaStreams.store.store.custom.ModelStateStoreType
 import de.heikoseeberger.akkahttpjackson.JacksonSupport
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.state.QueryableStoreTypes
 
+import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.concurrent.duration._
 
 /**
@@ -25,14 +26,14 @@ import scala.concurrent.duration._
  */
 object RestServiceStore {
 
-  implicit val system = ActorSystem("ModelServing")
-  implicit val materializer = ActorMaterializer()
-  implicit val executionContext = system.dispatcher
-  implicit val timeout = Timeout(10.seconds)
+  implicit val system: ActorSystem = ActorSystem("ModelServing")
+  implicit val materializer: ActorMaterializer = ActorMaterializer()
+  implicit val executionContext: ExecutionContextExecutor = system.dispatcher
+  implicit val timeout: Timeout = Timeout(10.seconds)
   val host = "127.0.0.1"
   val port = 8888
 
-  def startRestProxy(streams: KafkaStreams, port: Int, storeType : String) = {
+  def startRestProxy(streams: KafkaStreams, port: Int, storeType : String): Future[Unit] = {
 
     val routes: Route = QueriesResource.storeRoutes(streams, port, storeType)
     Http().bindAndHandle(routes, host, port) map

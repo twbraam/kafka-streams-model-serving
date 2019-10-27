@@ -1,20 +1,18 @@
-package main.scala.org.twbraam.kafkaStreams.modelserver.standardstore
+package org.twbraam.kafkaStreams.modelserver.standardstore
 
+import java.util
 import java.util.{HashMap, Properties}
 
 import org.apache.kafka.common.serialization.Serdes
-import org.apache.kafka.streams.state.Stores
-import org.apache.kafka.streams.KafkaStreams
-import org.apache.kafka.streams.StreamsBuilder
+import org.apache.kafka.streams.{KafkaStreams, StreamsBuilder}
 import org.apache.kafka.streams.kstream.{KStream, Predicate, ValueMapper}
-import com.lightbend.java.configuration.kafka.ApplicationKafkaParameters._
-import com.lightbend.kafka.scala.streams.StreamsBuilderS
-import com.lightbend.model.winerecord.WineRecord
-import com.lightbend.scala.kafkastreams.modelserver._
-import com.lightbend.scala.modelServer.model.{DataRecord, ModelToServe, ModelWithDescriptor, ServingResult}
-import com.lightbend.scala.kafkastreams.store.store.ModelStateSerde
-import com.lightbend.kafka.scala.streams.DefaultSerdes._
-import com.lightbend.kafka.scala.streams.ImplicitConversions._
+import org.apache.kafka.streams.state.Stores
+import org.twbraam.configuration.KafkaParameters._
+import org.twbraam.kafkaStreams.modelserver._
+import org.twbraam.kafkaStreams.store.store.ModelStateSerde
+import org.twbraam.model.winerecord.WineRecord
+import org.twbraam.modelServer.model.{DataRecord, ModelToServe, ModelWithDescriptor, ServingResult}
+import org.apache.kafka.streams.scala.ImplicitConversions._
 
 import scala.util.Try
 
@@ -27,12 +25,12 @@ object StandardStoreStreamBuilder {
   def createStreamsFluent(streamsConfiguration: Properties) : KafkaStreams = { // Create topology
 
     // Store definition
-    val logConfig = new HashMap[String, String]
+    val logConfig = new util.HashMap[String, String]
     val storeSupplier = Stores.inMemoryKeyValueStore(STORE_NAME)
     val storeBuilder = Stores.keyValueStoreBuilder(storeSupplier, Serdes.Integer, new ModelStateSerde).withLoggingEnabled(logConfig)
 
     // Create Stream builder
-    val builder = new StreamsBuilderS
+    val builder = new StreamsBuilder
     // Data input streams
     val data  = builder.stream[Array[Byte], Array[Byte]](DATA_TOPIC)
     val models  = builder.stream[Array[Byte], Array[Byte]](MODELS_TOPIC)
@@ -43,7 +41,7 @@ object StandardStoreStreamBuilder {
 
     // Data Processor
 
-    data
+    val x = data
       .mapValues(value => DataRecord.fromByteArray(value))
       .filter((key, value) => (value.isSuccess))
       .transform(() => new DataProcessor, STORE_NAME)
