@@ -2,8 +2,8 @@ package org.twbraam.kafkaStreams.modelserver.memorystore
 
 import java.util.Properties
 
-import org.twbraam.configuration.KafkaParameters._
 import org.apache.kafka.streams.{KafkaStreams, Topology}
+import org.twbraam.configuration.KafkaParameters._
 
 
 /**

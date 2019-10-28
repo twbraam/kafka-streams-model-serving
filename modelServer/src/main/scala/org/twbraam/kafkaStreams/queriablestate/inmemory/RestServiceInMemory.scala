@@ -6,13 +6,13 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
-import org.twbraam.kafkaStreams.store.StoreState
 import de.heikoseeberger.akkahttpjackson.JacksonSupport
 import org.apache.kafka.streams.KafkaStreams
+import org.twbraam.kafkaStreams.store.StoreState
 import org.twbraam.modelServer.model.ModelToServeStats
 
-import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContextExecutor, Future}
 
 /**
  *  A simple REST proxy that runs embedded in the Model server. This is used to

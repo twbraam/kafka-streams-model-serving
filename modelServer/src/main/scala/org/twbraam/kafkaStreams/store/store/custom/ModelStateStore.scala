@@ -1,13 +1,13 @@
 package org.twbraam.kafkaStreams.store.store.custom
 
-import org.twbraam.modelServer.model._
-import org.twbraam.kafkaStreams.store.StoreState
-import org.twbraam.kafkaStreams.store.store.ModelStateSerde
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.processor.{ProcessorContext, StateRestoreCallback, StateStore}
 import org.apache.kafka.streams.state.internals.StateStoreProvider
 import org.apache.kafka.streams.state.{QueryableStoreType, StateSerdes}
 import org.twbraam.configuration.KafkaParameters
+import org.twbraam.kafkaStreams.store.StoreState
+import org.twbraam.kafkaStreams.store.store.ModelStateSerde
+import org.twbraam.modelServer.model._
 
 /**
  * Implementation of a custom state store based on

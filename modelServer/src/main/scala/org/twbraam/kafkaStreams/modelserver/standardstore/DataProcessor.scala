@@ -2,14 +2,14 @@ package org.twbraam.kafkaStreams.modelserver.standardstore
 
 import java.util.Objects
 
-import org.twbraam.configuration.KafkaParameters
-import org.twbraam.model.winerecord.WineRecord
-import org.twbraam.modelServer.model.ServingResult
-import org.twbraam.kafkaStreams.store.StoreState
 import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.kstream.Transformer
 import org.apache.kafka.streams.processor.ProcessorContext
 import org.apache.kafka.streams.state.KeyValueStore
+import org.twbraam.configuration.KafkaParameters
+import org.twbraam.kafkaStreams.store.StoreState
+import org.twbraam.model.winerecord.WineRecord
+import org.twbraam.modelServer.model.ServingResult
 
 import scala.util.Try
 
@@ -18,7 +18,7 @@ import scala.util.Try
  * See also this example:
  * https://github.com/bbejeck/kafka-streams/blob/master/src/main/java/bbejeck/processor/stocks/StockSummaryProcessor.java
  */
-class DataProcessor extends Transformer[Array[Byte], Try[WineRecord], (Array[Byte], ServingResult)]{
+class DataProcessor extends Transformer[Array[Byte], Try[WineRecord], KeyValue[Array[Byte], ServingResult]]{
 
   private var modelStore: KeyValueStore[Integer, StoreState] = _
 
@@ -26,7 +26,7 @@ class DataProcessor extends Transformer[Array[Byte], Try[WineRecord], (Array[Byt
 
   // Exercise:
   // See the exercises described in com.lightbend.scala.kafkastreams.modelserver.customstore.DataProcessor.
-  override def transform(key: Array[Byte], dataRecord: Try[WineRecord]) : (Array[Byte], ServingResult) = {
+  override def transform(key: Array[Byte], dataRecord: Try[WineRecord]) : KeyValue[Array[Byte], ServingResult] = {
 
     var state = modelStore.get(STORE_ID)
     if (state == null) state = new StoreState
@@ -57,7 +57,7 @@ class DataProcessor extends Transformer[Array[Byte], Try[WineRecord], (Array[Byt
         ServingResult(processed = false)
     }
     modelStore.put(STORE_ID, state)
-    (key, result)
+    new KeyValue(key, result)
   }
 
   override def init(context: ProcessorContext): Unit = {

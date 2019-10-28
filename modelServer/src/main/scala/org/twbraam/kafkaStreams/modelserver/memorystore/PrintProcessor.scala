@@ -1,7 +1,7 @@
 package org.twbraam.kafkaStreams.modelserver.memorystore
 
-import org.twbraam.modelServer.model.ServingResult
 import org.apache.kafka.streams.processor.AbstractProcessor
+import org.twbraam.modelServer.model.ServingResult
 
 /**
  * Implements a topology processor that just prints out the results to stdout.

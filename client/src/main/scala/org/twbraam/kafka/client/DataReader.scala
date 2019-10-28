@@ -1,7 +1,7 @@
 package org.twbraam.kafka.client
 
-import org.twbraam.kafka.KafkaMessageListener
 import org.twbraam.configuration.KafkaParameters._
+import org.twbraam.kafka.KafkaMessageListener
 
 object DataReader {
 

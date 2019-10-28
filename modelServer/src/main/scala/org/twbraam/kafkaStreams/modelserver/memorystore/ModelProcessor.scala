@@ -1,8 +1,8 @@
 package org.twbraam.kafkaStreams.modelserver.memorystore
 
+import org.apache.kafka.streams.processor.{AbstractProcessor, ProcessorContext}
 import org.twbraam.kafkaStreams.store.StoreState
 import org.twbraam.modelServer.model.{ModelToServe, ModelToServeStats, ModelWithDescriptor}
-import org.apache.kafka.streams.processor.{AbstractProcessor, ProcessorContext}
 
 import scala.util.Success
 

@@ -1,24 +1,17 @@
 package org.twbraam.kafkaStreams.modelserver.standardstore
 
 import java.util
-import java.util.{HashMap, Properties}
+import java.util.Properties
 
 import org.apache.kafka.common.serialization.Serdes
-import org.apache.kafka.streams.kstream.internals.TransformerSupplierAdapter
-import org.apache.kafka.streams.scala.StreamsBuilder
-import org.apache.kafka.streams.{KafkaStreams, StreamsConfig}
-import org.apache.kafka.streams.kstream.{Predicate, TransformerSupplier, ValueMapper}
-import org.apache.kafka.streams.scala.kstream.KStream
-import org.apache.kafka.streams.state.Stores
-import org.twbraam.configuration.KafkaParameters._
-import org.twbraam.kafkaStreams.modelserver._
-import org.twbraam.kafkaStreams.store.store.ModelStateSerde
-import org.twbraam.model.winerecord.WineRecord
-import org.twbraam.modelServer.model.{DataRecord, ModelToServe, ModelWithDescriptor, ServingResult}
+import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.scala.ImplicitConversions._
 import org.apache.kafka.streams.scala.Serdes._
-
-import scala.util.Try
+import org.apache.kafka.streams.scala.StreamsBuilder
+import org.apache.kafka.streams.state.Stores
+import org.twbraam.configuration.KafkaParameters._
+import org.twbraam.kafkaStreams.store.store.ModelStateSerde
+import org.twbraam.modelServer.model.{DataRecord, ModelToServe, ModelWithDescriptor, ServingResult}
 
 /**
  * Use the Kafka Streams DSL to define the application streams.
@@ -57,18 +50,16 @@ object StandardStoreStreamBuilder {
         value
       })*/
 
-    TransformerSupplier
-    TransformerSupplierFromFunction
 
     data
       .mapValues(value => DataRecord.fromByteArray(value))
       .filter((_, value) => value.isSuccess)
-      .transform[Array[Byte], ServingResult](new DataProcessor, STORE_NAME)
-      .mapValues { value: ServingResult => {
+      .transform[Array[Byte], ServingResult](() => new DataProcessor, STORE_NAME)
+      .mapValues(value => {
         if (value.processed) println(s"Calculated quality - ${value.result} calculated in ${value.duration} ms")
         else println("No model available - skipping")
         value
-      }}
+      })
     // Exercise:
     // We just printed the result, but we didn't do anything else with it.
     // In particular, we might want to write the results to a new Kafka topic.

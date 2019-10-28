@@ -4,8 +4,8 @@ import java.util.Objects
 
 import org.apache.kafka.streams.processor.{AbstractProcessor, ProcessorContext}
 import org.twbraam.configuration.KafkaParameters
-import org.twbraam.modelServer.model.{ModelToServeStats, ModelWithDescriptor}
 import org.twbraam.kafkaStreams.store.store.custom.ModelStateStore
+import org.twbraam.modelServer.model.{ModelToServeStats, ModelWithDescriptor}
 
 import scala.util.Try
 

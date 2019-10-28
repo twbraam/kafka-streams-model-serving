@@ -1,22 +1,15 @@
 package org.twbraam.kafkaStreams.modelserver.customstore
 
-import java.util.{HashMap, Properties}
+import java.util
+import java.util.Properties
 
-import org.twbraam.kafkaStreams.store.store.custom.ModelStateStoreBuilder
-import org.twbraam.configuration.KafkaParameters._
-import org.apache.kafka.streams.scala.StreamsBuilder
-import org.twbraam.model.winerecord.WineRecord
-import org.twbraam.kafkaStreams.modelserver._
-import org.apache.kafka.streams.scala.kstream.KStream
-import org.twbraam.modelServer.model.{DataRecord, ModelToServe, ModelWithDescriptor, ServingResult}
 import org.apache.kafka.streams.KafkaStreams
-import org.apache.kafka.common.serialization.Serdes
-import org.apache.kafka.streams.kstream.{Predicate, ValueMapper}
-import org.apache.kafka.streams.state.Stores
 import org.apache.kafka.streams.scala.ImplicitConversions._
 import org.apache.kafka.streams.scala.Serdes._
-
-import scala.util.Try
+import org.apache.kafka.streams.scala.StreamsBuilder
+import org.twbraam.configuration.KafkaParameters._
+import org.twbraam.kafkaStreams.store.store.custom.ModelStateStoreBuilder
+import org.twbraam.modelServer.model.{DataRecord, ModelToServe, ModelWithDescriptor, ServingResult}
 
 /**
  * Use the Kafka Streams DSL to define the application streams.
@@ -24,10 +17,10 @@ import scala.util.Try
  */
 object CustomStoreStreamBuilder {
 
-  def createStreamsFluent(streamsConfiguration: Properties) : KafkaStreams = { // Create topology
+  def createStreamsFluent(streamsConfiguration: Properties): KafkaStreams = { // Create topology
 
     // Store definition
-    val logConfig = new HashMap[String, String]
+    val logConfig = new util.HashMap[String, String]
     val storeBuilder: ModelStateStoreBuilder = new ModelStateStoreBuilder(STORE_NAME).withLoggingEnabled(logConfig)
 
     // Create Stream builder
@@ -43,26 +36,26 @@ object CustomStoreStreamBuilder {
     // Data Processor
     data
       .mapValues(value => DataRecord.fromByteArray(value))
-      .filter((key, value) => (value.isSuccess))
-      .transform(() => new DataProcessor, STORE_NAME)
+      .filter((_, value) => value.isSuccess)
+      .transform[Array[Byte], ServingResult](() => new DataProcessor, STORE_NAME)
       .mapValues(value => {
-        if(value.processed) println(s"Calculated quality - ${value.result} calculated in ${value.duration} ms")
+        if (value.processed) println(s"Calculated quality - ${value.result} calculated in ${value.duration} ms")
         else println("No model available - skipping")
         value
       })
     //Models Processor
     models
       .mapValues(value => ModelToServe.fromByteArray(value))
-      .filter((key, value) => (value.isSuccess))
+      .filter((_, value) => value.isSuccess)
       .mapValues(value => ModelWithDescriptor.fromModelToServe(value.get))
-      .filter((key, value) => (value.isSuccess))
+      .filter((_, value) => value.isSuccess)
       .process(() => new ModelProcessor, STORE_NAME)
 
     // Create and build topology
     val topology = builder.build
     println(topology.describe)
 
-    return new KafkaStreams(topology, streamsConfiguration)
+    new KafkaStreams(topology, streamsConfiguration)
 
     // Exercise:
     // Like all good production code, we're ignoring errors ;) in the `data` and `models` code. That is, we filter to keep

@@ -1,14 +1,16 @@
 package org.twbraam.kafkaStreams.modelserver
 
-import org.twbraam.model.winerecord.WineRecord
-import org.twbraam.modelServer.model.{DataRecord, ModelToServe, ModelWithDescriptor, ServingResult}
 import org.apache.kafka.streams.kstream.{Predicate, ValueMapper}
+import org.twbraam.model.winerecord.WineRecord
+import org.twbraam.modelServer.model.{ModelToServe, ModelWithDescriptor, ServingResult}
 
 import scala.util.Try
+/*
 
 case class DataValueMapper(value: Array[Byte]) extends ValueMapper[Array[Byte], Try[WineRecord]] {
   DataRecord.fromByteArray(value)
 }
+*/
 
 class DataValueFilter extends Predicate[Array[Byte], Try[WineRecord]]{
   override def test(key: Array[Byte], value: Try[WineRecord]): Boolean = value.isSuccess

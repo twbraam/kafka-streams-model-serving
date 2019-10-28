@@ -2,14 +2,14 @@ package org.twbraam.kafkaStreams.modelserver
 
 import java.util.Properties
 
+import org.apache.kafka.common.serialization.Serdes
+import org.apache.kafka.streams.{KafkaStreams, StreamsConfig}
 import org.twbraam.configuration.KafkaParameters._
-import org.twbraam.kafkaStreams.queriablestate.withstore.RestServiceStore
 import org.twbraam.kafkaStreams.modelserver.customstore.CustomStoreStreamBuilder
 import org.twbraam.kafkaStreams.modelserver.memorystore.MemoryStoreStreamBuilder
 import org.twbraam.kafkaStreams.modelserver.standardstore.StandardStoreStreamBuilder
 import org.twbraam.kafkaStreams.queriablestate.inmemory.RestServiceInMemory
-import org.apache.kafka.common.serialization.Serdes
-import org.apache.kafka.streams.{KafkaStreams, StreamsConfig}
+import org.twbraam.kafkaStreams.queriablestate.withstore.RestServiceStore
 
 import scala.util.control.NonFatal
 
@@ -58,20 +58,20 @@ object KafkaModelServer {
     // You can either pick which one to run using a command-line argument, or for ease of use
     // with the IDE Run menu command, just switch which line is commented out for "case Nil => ...".
     val streams: KafkaStreams = args.toSeq match {
-      case ("m"  | "memory")   +: tail =>
+      case ("m"  | "memory")   +: _ =>
         println("Using in memory store")
         setupMemoryStoreStreams(streamsConfiguration)
-       case ("c"  | "custom")   +: tail =>
+       case ("c"  | "custom")   +: _ =>
          println("Using Custom store")
          setupCustomStoreStreams(streamsConfiguration)
-      case ("s"  | "standard") +: tail =>
+      case ("s"  | "standard") +: _ =>
         println("Using Standard store")
         setupStandardStoreStreams(streamsConfiguration)
-      case ("-h" | "--help")   +: tail => help()
+      case ("-h" | "--help")   +: _ => help()
       case Nil =>
 //        setupMemoryStoreStreams(streamsConfiguration)
-        setupCustomStoreStreams(streamsConfiguration)
-//        setupStandardStoreStreams(streamsConfiguration)
+//        setupCustomStoreStreams(streamsConfiguration)
+        setupStandardStoreStreams(streamsConfiguration)
       case _ => help(s"Unexpected arguments: ${args.mkString(" ")}", 1)
     }
 
