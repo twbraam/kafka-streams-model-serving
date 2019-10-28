@@ -6,8 +6,8 @@ import org.apache.kafka.streams.kstream.{Predicate, ValueMapper}
 
 import scala.util.Try
 
-class DataValueMapper extends ValueMapper[Array[Byte], Try[WineRecord]] {
-  override def apply(value: Array[Byte]): Try[WineRecord] = DataRecord.fromByteArray(value)
+case class DataValueMapper(value: Array[Byte]) extends ValueMapper[Array[Byte], Try[WineRecord]] {
+  DataRecord.fromByteArray(value)
 }
 
 class DataValueFilter extends Predicate[Array[Byte], Try[WineRecord]]{

@@ -17,7 +17,7 @@ import scala.util.Try
  * See also this example:
  * https://github.com/bbejeck/kafka-streams/blob/master/src/main/java/bbejeck/processor/stocks/StockSummaryProcessor.java
  */
-class DataProcessor extends Transformer[Array[Byte], Try[WineRecord], (Array[Byte], ServingResult)]{
+class DataProcessor[K, V, R] extends Transformer[K, V, R]{
 
   private var modelStore: ModelStateStore = null
 
@@ -48,7 +48,7 @@ class DataProcessor extends Transformer[Array[Byte], Try[WineRecord], (Array[Byt
   // Modify the model management and scoring logic to implement one or both scenarios. Again,
   // using Akka Actors or another concurrency library will be required.
 
-  override def transform(key: Array[Byte], dataRecord: Try[WineRecord]) : (Array[Byte], ServingResult) = {
+  override def transform(key: K, dataRecord: Try[WineRecord]) : (Array[Byte], ServingResult) = {
 
     modelStore.state.newModel match {
       case Some(model) => {
