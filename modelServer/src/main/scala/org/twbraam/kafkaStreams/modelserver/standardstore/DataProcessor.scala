@@ -18,7 +18,7 @@ import scala.util.Try
  * See also this example:
  * https://github.com/bbejeck/kafka-streams/blob/master/src/main/java/bbejeck/processor/stocks/StockSummaryProcessor.java
  */
-class DataProcessor[K, V, R] extends Transformer[K, V, R]{
+class DataProcessor extends Transformer[Array[Byte], Try[WineRecord], (Array[Byte], ServingResult)]{
 
   private var modelStore: KeyValueStore[Integer, StoreState] = _
 
@@ -26,7 +26,7 @@ class DataProcessor[K, V, R] extends Transformer[K, V, R]{
 
   // Exercise:
   // See the exercises described in com.lightbend.scala.kafkastreams.modelserver.customstore.DataProcessor.
-  override def transform(key: Array[Byte], dataRecord: Try[WineRecord]): R = {
+  override def transform(key: Array[Byte], dataRecord: Try[WineRecord]) : (Array[Byte], ServingResult) = {
 
     var state = modelStore.get(STORE_ID)
     if (state == null) state = new StoreState
