@@ -70,8 +70,8 @@ object KafkaModelServer {
       case ("-h" | "--help")   +: tail => help()
       case Nil =>
 //        setupMemoryStoreStreams(streamsConfiguration)
-        setupCustomStoreStreams(streamsConfiguration)
-//        setupStandardStoreStreams(streamsConfiguration)
+//        setupCustomStoreStreams(streamsConfiguration)
+        setupStandardStoreStreams(streamsConfiguration)
       case _ => help(s"Unexpected arguments: ${args.mkString(" ")}", 1)
     }
 

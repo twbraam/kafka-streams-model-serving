@@ -11,7 +11,7 @@ import scala.util.Success
  * See also this example:
  * https://github.com/bbejeck/kafka-streams/blob/master/src/main/java/bbejeck/processor/stocks/StockSummaryProcessor.java
  */
-class DataProcessor extends AbstractProcessor[Array[Byte], Array[Byte]]{
+class DataProcessor extends AbstractProcessor[Array[Byte], Array[Byte]] {
 
   private var modelStore: StoreState = null
   private var ctx: ProcessorContext = null
@@ -20,9 +20,9 @@ class DataProcessor extends AbstractProcessor[Array[Byte], Array[Byte]]{
   // See the exercises described in com.lightbend.scala.kafkastreams.modelserver.customstore.DataProcessor.
   override def process(key: Array[Byte], value: Array[Byte]): Unit = {
     DataRecord.fromByteArray(value) match {
-      case Success(dataRecord) => {
+      case Success(dataRecord) =>
         modelStore.newModel match {
-          case Some(model) => {
+          case Some(model) =>
             // close current model first
             modelStore.currentModel match {
               case Some(m) => m.cleanup()
@@ -32,7 +32,6 @@ class DataProcessor extends AbstractProcessor[Array[Byte], Array[Byte]]{
             modelStore.currentModel = Some(model)
             modelStore.currentState = modelStore.newState
             modelStore.newModel = None
-          }
           case _ =>
         }
         modelStore.currentModel match {
@@ -40,17 +39,15 @@ class DataProcessor extends AbstractProcessor[Array[Byte], Array[Byte]]{
             val start = System.currentTimeMillis()
             val quality = model.score(dataRecord).asInstanceOf[Double]
             val duration = System.currentTimeMillis() - start
-//            println(s"Calculated quality - $quality calculated in $duration ms")
+            // println(s"Calculated quality - $quality calculated in $duration ms")
             modelStore.currentState = modelStore.currentState.map(_.incrementUsage(duration))
             ctx.forward(key, ServingResult(quality, duration))
           }
-          case _ => {
-//            println("No model available - skipping")
+          case _ =>
+            // println("No model available - skipping")
             ctx.forward(key, ServingResult.noModel)
-          }
         }
         ctx.commit()
-      }
       case _ => // error; ignore
         // Exercise:
         // Like all good production code, we're ignoring errors ;) here! That is, we filter to keep

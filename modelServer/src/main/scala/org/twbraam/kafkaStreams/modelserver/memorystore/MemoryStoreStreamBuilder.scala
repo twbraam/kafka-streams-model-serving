@@ -5,7 +5,6 @@ import java.util.Properties
 import org.twbraam.configuration.KafkaParameters._
 import org.apache.kafka.streams.{KafkaStreams, Topology}
 
-
 /**
  * Use the lower level topology API for defining the Kafka Streams processing "nodes".
  * Store the running state in memory only, which of course is not durable.
