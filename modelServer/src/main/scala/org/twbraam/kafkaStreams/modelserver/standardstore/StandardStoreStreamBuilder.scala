@@ -38,28 +38,15 @@ object StandardStoreStreamBuilder {
 
 
     // Data Processor
-
-/*    val x = data
-      .mapValues(value => DataRecord.fromByteArray(value))
-    x
-      .filter((key, value) => (value.isSuccess))
-      .transform(() => new DataProcessor, STORE_NAME)
-      .mapValues(value => {
-        if(value.processed) println(s"Calculated quality - ${value.result} calculated in ${value.duration} ms")
-        else println("No model available - skipping")
-        value
-      })*/
-
-
     data
       .mapValues(value => DataRecord.fromByteArray(value))
       .filter((_, value) => value.isSuccess)
       .transform[Array[Byte], ServingResult](() => new DataProcessor, STORE_NAME)
-      .mapValues(value => {
+      .mapValues { value: ServingResult => {
         if (value.processed) println(s"Calculated quality - ${value.result} calculated in ${value.duration} ms")
         else println("No model available - skipping")
         value
-      })
+      }}
     // Exercise:
     // We just printed the result, but we didn't do anything else with it.
     // In particular, we might want to write the results to a new Kafka topic.

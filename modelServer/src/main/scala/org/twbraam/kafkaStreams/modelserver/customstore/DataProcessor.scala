@@ -2,13 +2,13 @@ package org.twbraam.kafkaStreams.modelserver.customstore
 
 import java.util.Objects
 
+import org.apache.kafka.streams.processor.ProcessorContext
+import org.twbraam.model.winerecord.WineRecord
+import org.twbraam.configuration.KafkaParameters
+import org.twbraam.modelServer.model.ServingResult
+import org.twbraam.kafkaStreams.store.store.custom.ModelStateStore
 import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.kstream.Transformer
-import org.apache.kafka.streams.processor.ProcessorContext
-import org.twbraam.configuration.KafkaParameters
-import org.twbraam.kafkaStreams.store.store.custom.ModelStateStore
-import org.twbraam.model.winerecord.WineRecord
-import org.twbraam.modelServer.model.ServingResult
 
 import scala.util.Try
 
@@ -17,9 +17,9 @@ import scala.util.Try
  * See also this example:
  * https://github.com/bbejeck/kafka-streams/blob/master/src/main/java/bbejeck/processor/stocks/StockSummaryProcessor.java
  */
-class DataProcessor extends Transformer[Array[Byte], Try[WineRecord], KeyValue[Array[Byte], ServingResult]]{
+class DataProcessor extends Transformer[Array[Byte], Try[WineRecord], KeyValue[Array[Byte], ServingResult]] {
 
-  private var modelStore: ModelStateStore = _
+  private var modelStore: ModelStateStore = null
 
   import KafkaParameters._
 
@@ -51,7 +51,7 @@ class DataProcessor extends Transformer[Array[Byte], Try[WineRecord], KeyValue[A
   override def transform(key: Array[Byte], dataRecord: Try[WineRecord]) : KeyValue[Array[Byte], ServingResult] = {
 
     modelStore.state.newModel match {
-      case Some(_) =>
+      case Some(model) => {
         // close current model first
         modelStore.state.currentModel match {
           case Some(m) => m.cleanup()
@@ -61,75 +61,32 @@ class DataProcessor extends Transformer[Array[Byte], Try[WineRecord], KeyValue[A
         modelStore.state.currentModel = modelStore.state.newModel
         modelStore.state.currentState = modelStore.state.newState
         modelStore.state.newModel = None
+      }
       case _ =>
     }
     val result = modelStore.state.currentModel match {
-      case Some(model) =>
+      case Some(model) => {
         val start = System.currentTimeMillis()
         val quality = model.score(dataRecord.get).asInstanceOf[Double]
         val duration = System.currentTimeMillis() - start
         //        println(s"Calculated quality - $quality calculated in $duration ms")
         modelStore.state.currentState = modelStore.state.currentState.map(_.incrementUsage(duration))
         ServingResult(quality, duration)
-      case _ =>
+      }
+      case _ => {
         //        println("No model available - skipping")
         ServingResult.noModel
+      }
     }
     new KeyValue(key, result)
   }
 
   override def init(context: ProcessorContext): Unit = {
-    modelStore = context.getStateStore(STORE_NAME).asInstanceOf[ModelStateStore]
+    modelStore = context.getStateStore(STORE_NAME).asInstanceOf[ModelStateStore];
     Objects.requireNonNull(modelStore, "State store can't be null")
   }
 
   override def close(): Unit = {}
 
   def punctuate(timestamp: Long): (Array[Byte], ServingResult) = null
-}
-
-
-class DataProcessorKV extends Transformer[Array[Byte], Try[WineRecord], KeyValue[Array[Byte], ServingResult]]{
-
-  private var modelStore: ModelStateStore = _
-
-  import KafkaParameters._
-
-  override def transform(key: Array[Byte], dataRecord: Try[WineRecord]) : KeyValue[Array[Byte], ServingResult] = {
-    modelStore.state.newModel match {
-      case Some(_) =>
-        // close current model first
-        modelStore.state.currentModel match {
-          case Some(m) => m.cleanup()
-          case _ =>
-        }
-        // Update model
-        modelStore.state.currentModel = modelStore.state.newModel
-        modelStore.state.currentState = modelStore.state.newState
-        modelStore.state.newModel = None
-      case _ =>
-    }
-    val result = modelStore.state.currentModel match {
-      case Some(model) =>
-        val start = System.currentTimeMillis()
-        val quality = model.score(dataRecord.get).asInstanceOf[Double]
-        val duration = System.currentTimeMillis() - start
-        //        println(s"Calculated quality - $quality calculated in $duration ms")
-        modelStore.state.currentState = modelStore.state.currentState.map(_.incrementUsage(duration))
-        ServingResult(quality, duration)
-      case _ =>
-        //        println("No model available - skipping")
-        ServingResult.noModel
-    }
-    KeyValue.pair(key,result)
-  }
-
-  override def init(context: ProcessorContext): Unit = {
-    modelStore = context.getStateStore(STORE_NAME).asInstanceOf[ModelStateStore]
-    Objects.requireNonNull(modelStore, "State store can't be null")
-  }
-
-  override def close(): Unit = {}
-
-  def punctuate(timestamp: Long): KeyValue[Array[Byte], ServingResult] = null
 }
