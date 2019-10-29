@@ -37,10 +37,8 @@ class TensorFlowModel(inputStream: Array[Byte]) extends Model {
     val rMatrix = Array.ofDim[Float](rshape(0).asInstanceOf[Int], rshape(1).asInstanceOf[Int])
     result.copyTo(rMatrix)
     var value = (0, rMatrix(0)(0))
-    (1 until rshape(1).asInstanceOf[Int]) foreach { i => {
-      if (rMatrix(0)(i) > value._2)
-        value = (i, rMatrix(0)(i))
-    }
+    (1 until rshape(1).asInstanceOf[Int]) foreach { i =>
+      if (rMatrix(0)(i) > value._2) value = (i, rMatrix(0)(i))
     }
     value._1.toDouble
   }

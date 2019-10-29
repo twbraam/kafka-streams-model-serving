@@ -18,7 +18,7 @@ object DataProvider {
   var dataTimeInterval: Int = 1000 * 1 // 1 sec
   val directory = "data/"
   val tensorFile = "data/optimized_WineQuality.pb"
-  var modelTimeInterval: Int = 1000 * 60 * 1 // 5 mins
+  var modelTimeInterval: Int = 1000 * 60 * 1 // 1 min
 
   def main(args: Array[String]) {
 

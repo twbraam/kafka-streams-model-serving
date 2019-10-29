@@ -13,7 +13,7 @@ import scala.reflect.io.Directory
 /**
  * Helper class for working with a local, embedded instance of Kafka.
  */
-case class KafkaLocalServer private(kafkaProperties: Properties, zooKeeperServer: ZooKeeperLocalServer) {
+case class KafkaLocalServer private (kafkaProperties: Properties, zooKeeperServer: ZooKeeperLocalServer) {
 
   // Exercise:
   // Create a similar set of classes for a real Kafka cluster. See the Kafka documentation for
@@ -151,4 +151,3 @@ object KafkaLocalServer {
     dataDirectory
   }
 }
-
