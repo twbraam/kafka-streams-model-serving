@@ -65,18 +65,16 @@ class DataProcessor extends Transformer[Array[Byte], Try[WineRecord], KeyValue[A
       case _ =>
     }
     val result = modelStore.state.currentModel match {
-      case Some(model) => {
-        val start = System.currentTimeMillis()
-        val quality = model.score(dataRecord.get).asInstanceOf[Double]
-        val duration = System.currentTimeMillis() - start
-        //        println(s"Calculated quality - $quality calculated in $duration ms")
+      case Some(model) =>
+        val start: Long = System.currentTimeMillis()
+        val quality: Double = model.score(dataRecord.get).getOrElse(0.0)
+        val duration: Long = System.currentTimeMillis() - start
+
         modelStore.state.currentState = modelStore.state.currentState.map(_.incrementUsage(duration))
         ServingResult(quality, duration)
-      }
-      case _ => {
+      case _ =>
         //        println("No model available - skipping")
         ServingResult.noModel
-      }
     }
     new KeyValue(key, result)
   }
