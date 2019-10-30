@@ -46,9 +46,10 @@ class DataProcessor extends Transformer[Array[Byte], Try[WineRecord], KeyValue[A
     }
     val result = state.currentModel match {
       case Some(model) =>
-        val start = System.currentTimeMillis()
-        val quality = model.score(dataRecord.get).asInstanceOf[Double]
-        val duration = System.currentTimeMillis() - start
+        val start: Long = System.currentTimeMillis()
+        val quality: Double = model.score(dataRecord.get).getOrElse(0.0)
+        val duration: Long = System.currentTimeMillis() - start
+
         //        println(s"Calculated quality - $quality calculated in $duration ms")
         state.currentState = state.currentState.map(_.incrementUsage(duration))
         ServingResult(processed = true, quality, duration)

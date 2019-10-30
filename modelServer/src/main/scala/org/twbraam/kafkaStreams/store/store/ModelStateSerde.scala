@@ -3,12 +3,12 @@ package org.twbraam.kafkaStreams.store.store
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, DataInputStream, DataOutputStream}
 import java.util
 
+import org.apache.kafka.common.serialization.{Deserializer, Serde, Serializer}
+import org.twbraam.kafkaStreams.store.StoreState
 import org.twbraam.model.modeldescriptor.ModelDescriptor
 import org.twbraam.modelServer.model.PMML.PMMLModel
 import org.twbraam.modelServer.model.tensorflow.TensorFlowModel
 import org.twbraam.modelServer.model.{ModelFactory, ModelToServeStats, ModelWithDescriptor}
-import org.twbraam.kafkaStreams.store.StoreState
-import org.apache.kafka.common.serialization.{Deserializer, Serde, Serializer}
 
 /**
  * Serialization and deserialization of model stat information. Needed for durable storage. Based on

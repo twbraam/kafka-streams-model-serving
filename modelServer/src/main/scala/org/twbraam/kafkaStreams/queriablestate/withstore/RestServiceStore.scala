@@ -1,22 +1,22 @@
 package org.twbraam.kafkaStreams.queriablestate.withstore
 
-import javax.ws.rs.NotFoundException
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
-import org.twbraam.kafkaStreams.queriablestate.MetadataService
-import org.twbraam.configuration.KafkaParameters._
-import org.twbraam.kafkaStreams.store.StoreState
-import org.twbraam.kafkaStreams.store.store.custom.ModelStateStoreType
 import de.heikoseeberger.akkahttpjackson.JacksonSupport
+import javax.ws.rs.NotFoundException
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.state.QueryableStoreTypes
+import org.twbraam.configuration.KafkaParameters._
+import org.twbraam.kafkaStreams.queriablestate.MetadataService
+import org.twbraam.kafkaStreams.store.StoreState
+import org.twbraam.kafkaStreams.store.store.custom.ModelStateStoreType
 
-import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContextExecutor, Future}
 
 /**
  *  A simple REST proxy that runs embedded in the Model server. This is used to

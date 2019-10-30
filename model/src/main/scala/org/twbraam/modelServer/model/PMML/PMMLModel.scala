@@ -6,8 +6,10 @@ import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 
 import org.dmg.pmml.{FieldName, PMML}
 import org.jpmml.evaluator._
-import org.jpmml.evaluator.visitors._
-import org.jpmml.model.PMMLUtil
+import org.jpmml.model.{PMMLUtil, VisitorBattery}
+import org.jpmml.model.visitors.{AttributeInternerBattery, AttributeOptimizerBattery, ListFinalizerBattery}
+import org.jpmml.evaluator.visitors.{ElementInternerBattery, ElementOptimizerBattery}
+
 import org.twbraam.model.modeldescriptor.ModelDescriptor
 import org.twbraam.model.winerecord.WineRecord
 import org.twbraam.modelServer.model.{Model, ModelFactory, ModelToServe}
@@ -20,36 +22,39 @@ import scala.collection._
  */
 class PMMLModel(inputStream: Array[Byte]) extends Model {
 
-  var arguments = mutable.Map[FieldName, FieldValue]()
+  var arguments: mutable.Map[FieldName, FieldValue] = mutable.Map[FieldName, FieldValue]()
 
   // Marshall PMML
-  val pmml = PMMLUtil.unmarshal(new ByteArrayInputStream(inputStream))
+  val pmml: PMML = PMMLUtil.unmarshal(new ByteArrayInputStream(inputStream))
 
-  // Optimize model// Optimize model
+  // Optimize model // Optimize model
   PMMLModel.optimize(pmml)
 
   // Create and verify evaluator
-  val evaluator = ModelEvaluatorFactory.newInstance.newModelEvaluator(pmml)
+  val evaluator: ModelEvaluator[_] = ModelEvaluatorFactory.newInstance.newModelEvaluator(pmml)
   evaluator.verify()
 
   // Get input/target fields
-  val inputFields = evaluator.getInputFields
+  val inputFields: List[InputField] = evaluator.getInputFields.asScala.toList
   val target: TargetField = evaluator.getTargetFields.get(0)
-  val tname = target.getName
+  val tname: FieldName = target.getName
 
-  override def score(record: WineRecord): Any = {
-    arguments.clear()
-    inputFields.asScala.foreach(field => {
-      arguments.put(field.getName, field.prepare(getValueByName(record, field.getName.getValue)))
-    })
+  override def score(record: WineRecord): Option[Double] = {
+
+    val arguments: Map[FieldName, FieldValue] = inputFields.map { field => (
+      field.getName,
+      field.prepare(getValueByName(record, field.getName.getValue))
+    )}.toMap
 
     // Calculate Output// Calculate Output
     val result = evaluator.evaluate(arguments.asJava)
 
     // Prepare output
     result.get(tname) match {
-      case c: Computable => c.getResult.toString.toDouble
-      case v => v
+      case c: Computable => Some(c.getResult.toString.toDouble)
+      case score: Double => Some(score)
+      case score: Int => Some(score.toDouble)
+      case x => println(x); None
     }
   }
 
@@ -57,11 +62,10 @@ class PMMLModel(inputStream: Array[Byte]) extends Model {
 
   private def getValueByName(input: WineRecord, name: String): Double =
     PMMLModel.names.get(name) match {
-      case Some(index) => {
+      case Some(index) =>
         val v = input.getFieldByNumber(index + 1)
         v.asInstanceOf[Double]
-      }
-      case _ =>.0
+      case _ => .0
     }
 
   override def toBytes: Array[Byte] = {
@@ -74,21 +78,28 @@ class PMMLModel(inputStream: Array[Byte]) extends Model {
 }
 
 object PMMLModel extends ModelFactory {
+  val optimizers = new VisitorBattery
 
-  private val optimizers = Array(new ExpressionOptimizer, new FieldOptimizer, new PredicateOptimizer,
-    new GeneralRegressionModelOptimizer, new NaiveBayesModelOptimizer, new RegressionModelOptimizer)
+  // Pre-parsing PMML elements
+  optimizers.addAll(new AttributeOptimizerBattery)
+  optimizers.addAll(new ElementOptimizerBattery)
+
+  // Getting rid of duplicate PMML attribute values and PMML elements
+  optimizers.addAll(new AttributeInternerBattery)
+  optimizers.addAll(new ElementInternerBattery)
+
+  // Freezing the final representation of PMML elements
+  optimizers.addAll(new ListFinalizerBattery)
 
   def optimize(pmml: PMML): Unit = this.synchronized {
-    optimizers.foreach(opt =>
       try {
-        opt.applyTo(pmml)
+        optimizers.applyTo(pmml)
       } catch {
-        case t: Throwable => {
-          println(s"Error optimizing model for optimizer $opt")
+        case t: Throwable =>
+          println(s"Error optimizing model for optimizer $optimizers")
           t.printStackTrace()
           throw t
-        }
-      })
+      }
   }
 
   private val names = Map(

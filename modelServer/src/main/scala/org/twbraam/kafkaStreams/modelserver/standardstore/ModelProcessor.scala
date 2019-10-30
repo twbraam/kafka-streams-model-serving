@@ -2,11 +2,11 @@ package org.twbraam.kafkaStreams.modelserver.standardstore
 
 import java.util.Objects
 
-import org.twbraam.configuration.KafkaParameters
-import org.twbraam.modelServer.model.{ModelToServeStats, ModelWithDescriptor}
-import org.twbraam.kafkaStreams.store.StoreState
 import org.apache.kafka.streams.processor.{AbstractProcessor, ProcessorContext}
 import org.apache.kafka.streams.state.KeyValueStore
+import org.twbraam.configuration.KafkaParameters
+import org.twbraam.kafkaStreams.store.StoreState
+import org.twbraam.modelServer.model.{ModelToServeStats, ModelWithDescriptor}
 
 import scala.util.Try
 

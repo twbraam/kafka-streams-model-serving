@@ -16,7 +16,7 @@ class TensorFlowModel(inputStream: Array[Byte]) extends Model {
   graph.importGraphDef(inputStream)
   val session = new Session(graph)
 
-  override def score(record: WineRecord): Any = {
+  override def score(record: WineRecord): Option[Double] = {
 
     val data = Array(
       record.fixedAcidity.toFloat,
@@ -40,7 +40,7 @@ class TensorFlowModel(inputStream: Array[Byte]) extends Model {
     (1 until rshape(1).asInstanceOf[Int]) foreach { i =>
       if (rMatrix(0)(i) > value._2) value = (i, rMatrix(0)(i))
     }
-    value._1.toDouble
+    Some(value._1.toDouble)
   }
 
   // Exercise:

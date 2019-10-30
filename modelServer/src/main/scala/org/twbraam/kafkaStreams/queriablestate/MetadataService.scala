@@ -3,11 +3,11 @@ package org.twbraam.kafkaStreams.queriablestate
 import java.net.InetAddress
 import java.util
 
-import org.twbraam.kafkaStreams.store.HostStoreInfo
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.state.{HostInfo, StreamsMetadata}
 import org.twbraam.configuration.KafkaParameters
+import org.twbraam.kafkaStreams.store.HostStoreInfo
 
 import scala.collection.JavaConverters._
 
